@@ -75,7 +75,6 @@ runs:
       payload=`http GET "$BASE_SERVICE_HUB_URL/resources?resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=gateway-manager&filter[name][eq]=${{ inputs.service_name }}" Authorization:"Bearer ${{ inputs.konnect_token }}"`
       echo "httpbin_service_id=$(echo $payload | jq -r '.data[0].id')" >> $GITHUB_OUTPUT
 
-  - name: Map Kong Gateway Service to Service Catalog Entry
   - name: Map Gateway Service to Service Catalog Entry
     shell: bash
     run: |
