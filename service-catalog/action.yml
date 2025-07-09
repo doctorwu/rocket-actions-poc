@@ -1,11 +1,14 @@
 name: 'AI Spec Converter'
 description: 'This action converts AI specifications to different formats.'
 inputs:
-  source-format:  # id of input
+  konnect_token:  # id of input
+    description: 'Konnect API token for authentication'
+    required: true
+  source_format:  # id of input
     description: 'Source format of the AI specification'
     required: true
     default: 'wsdl'
-  source-file:  # id of input
+  source_file:  # id of input
     description: 'Path to the source AI specification file'
     required: true
 outputs:
@@ -30,10 +33,10 @@ runs:
       - name: Create Service Catalog Entry
         id: create_service
         run: |
-          payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ secrets.konnect_token }}" < $GITHUB_WORKSPACE/service-catalog/raml-service.json`
+          payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ inputs.konnect_token }}" < $GITHUB_WORKSPACE/service-catalog/raml-service.json`
           echo "service_id=$(echo $payload | jq -r '.id')" >> $GITHUB_OUTPUT
 
       - name: Attach Documentation to Service
         run: |
           export raw_content=`cat /tmp/raml.md| base64 -w0` ; cat $GITHUB_WORKSPACE/service-catalog/raml-documentation.json | envsubst '$raw_content' > /tmp/raml-documentation.json
-          http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ secrets.konnect_token }}" < /tmp/raml-documentation.json
+          http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/raml-documentation.json
