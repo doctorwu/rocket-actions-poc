@@ -39,13 +39,13 @@ runs:
     shell: bash
     run: |
       export raw_content=`cat ${{ inputs.documentation_data }} | base64 -w0` ; ${{ inputs.documentation_template }} | envsubst '$raw_content' > /tmp/documentation.json
-      http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ secrets.konnect_token }}" < /tmp/documentation.json
+      http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/documentation.json
 
   - name: Set Required Service Catalog GitHub Integration IDs
     shell: bash
     id: github_integration_id
     run: |
-      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=github" Authorization:"Bearer ${{ secrets.konnect_token }}"`
+      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=github" Authorization:"Bearer ${{ inputs.konnect_token }}"`
       echo "integration_instance_id=$(echo $payload | jq -r '.data[0].integration.instance.id')" >> $GITHUB_OUTPUT
       echo "integration_resource_id=$(echo $payload | jq -r '.data[0].id')" >> $GITHUB_OUTPUT
 
@@ -54,42 +54,42 @@ runs:
     run: |
       export INTEGRATION_INSTANCE_ID=${{ steps.github_integration_id.outputs.integration_instance_id }}
       cat ${{ inputs.openapi_spec }} | envsubst '$INTEGRATION_INSTANCE_ID' > /tmp/spec.json
-      http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/api-specs" Authorization:"Bearer ${{ secrets.konnect_token }}" < /tmp/spec.json
+      http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/api-specs" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/spec.json
 
   - name: Map GitHub Integration to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ secrets.konnect_token }}" resource_id="${{ steps.github_integration_id.outputs.integration_resource_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.github_integration_id.outputs.integration_resource_id }}"
 
   - name: Get Control Plane id
     shell: bash
     id: control_plane_id
     run: |
-      payload=`http GET "https://us.api.konghq.com/v2/control-planes?filter[name][eq]=${{ inputs.control_plane_name }}" Authorization:"Bearer ${{ secrets.konnect_token }}"`
+      payload=`http GET "https://us.api.konghq.com/v2/control-planes?filter[name][eq]=${{ inputs.control_plane_name }}" Authorization:"Bearer ${{ inputs.konnect_token }}"`
       echo "control_plane_id=$(echo $payload | jq -r '.data[0].id')" >> $GITHUB_OUTPUT
 
   - name: Output HTTPBin service id
     shell: bash
     id: httpbin_service_id
     run: |
-      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=gateway-manager&filter[name][eq]=${{ inputs.service_name }}" Authorization:"Bearer ${{ secrets.konnect_token }}"`
+      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=gateway-manager&filter[name][eq]=${{ inputs.service_name }}" Authorization:"Bearer ${{ inputs.konnect_token }}"`
       echo "httpbin_service_id=$(echo $payload | jq -r '.data[0].id')" >> $GITHUB_OUTPUT
 
   - name: Map Kong Gateway Service to Service Catalog Entry
   - name: Map Gateway Service to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ secrets.konnect_token }}" resource_id="${{ steps.httpbin_service_id.outputs.httpbin_service_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.httpbin_service_id.outputs.httpbin_service_id }}"
 
   - name: Get Analytics Resource ID
     shell: bash
     id: analytics_resource
     if: ${{ inputs.analytics_resource_name != '' }}
     run: |
-      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=analytics&filter[name][eq]=${{ inputs.analytics_resource_name }}" Authorization:"Bearer ${{ secrets.konnect_token }}"`
+      payload=`http GET "$BASE_SERVICE_HUB_URL/resources?resources?filter%5Barchived%5D=false&filter%5Bintegration.name%5D%5Beq%5D=analytics&filter[name][eq]=${{ inputs.analytics_resource_name }}" Authorization:"Bearer ${{ inputs.konnect_token }}"`
       echo "analytics_resource_id=$(echo $payload | jq -r '.data[0].id')" >> $GITHUB_OUTPUT
 
   - name: Map Analytics Resource to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ secrets.konnect_token }}" resource_id="${{ steps.analytics_resource.outputs.analytics_resource_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.analytics_resource.outputs.analytics_resource_id }}"
