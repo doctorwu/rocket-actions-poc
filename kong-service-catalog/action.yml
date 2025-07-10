@@ -16,6 +16,9 @@ inputs:
   openapi_spec:
     description: 'Path to the OpenAPI specification file'
     required: true
+  github_openapi_resource:
+    description: 'GitHub resource for the OpenAPI specification'
+    required: true
   control_plane_name:
     description: 'Name of the control plane to associate with the service'
     required: true
@@ -79,7 +82,7 @@ runs:
     shell: bash
     run: |
       export INTEGRATION_INSTANCE_ID=${{ steps.github_integration_id.outputs.integration_instance_id }}
-      cat ${{ inputs.openapi_spec }} | envsubst '$INTEGRATION_INSTANCE_ID' > /tmp/spec.json
+      cat ${{ inputs.github_openapi_resource }} | envsubst '$INTEGRATION_INSTANCE_ID' > /tmp/spec.json
       http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/api-specs" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/spec.json
 
   - name: Map GitHub Integration to Service Catalog Entry
