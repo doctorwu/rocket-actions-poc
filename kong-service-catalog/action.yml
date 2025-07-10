@@ -25,9 +25,32 @@ inputs:
   analytics_resource_name:
     description: 'Name of the analytics resource to be associated with the service'
     required: false
+  deck_config_file:
+    description: 'Path to the deck configuration file'
+    required: false
+    default: 'kong.yaml'
+  deck_plugins_file:
+    description: 'Path to the deck plugins file'
+    required: false
+  consumers_file:
+    description: 'Path to the consumers file'
+    required: false
 runs:
   using: "composite"
   steps:
+  - name: Configure demo Konnect Control Plane
+    if: ${{ inputs.deck_config_file != '' }}
+    shell: bash
+    env:
+      PLUGINS_FILE: ${{ inputs.deck_plugins_file }}
+      CONSUMERS_FILE: ${{ inputs.consumers_file }}
+    run: |
+        cat ${{ inputs.openapi_spec }} | \
+        deck file openapi2kong --select-tag httpbin -i | \
+        if [[ -n "$PLUGINS_FILE" ]]; then deck file add-plugins ${{ inputs.deck_plugins_file }} > /tmp/kong.yaml; fi
+        if [[ -n "$CONSUMERS_FILE" ]]; then deck file merge ${{ inputs.consumers_file }} /tmp/kong.yaml; fi | \
+        deck --konnect-token ${{ inputs.konnect_token }} --konnect-control-plane-name demo --select-tag httpbin gateway sync
+
   - name: Create Service Catalog Entry
     shell: bash
     id: create_service
