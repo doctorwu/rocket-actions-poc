@@ -28,24 +28,19 @@ inputs:
   analytics_resource_name:
     description: 'Name of the analytics resource to be associated with the service'
     required: false
-  deck_config_file:
-    description: 'Path to the deck configuration file'
-    required: false
-    default: 'kong.yaml'
   deck_plugins_file:
     description: 'Path to the deck plugins file'
     required: false
   deck_select_tag:
     description: 'Tag to select for the deck command'
     required: false
-  consumers_file:
+  deck_consumers_file:
     description: 'Path to the consumers file'
     required: false
 runs:
   using: "composite"
   steps:
   - name: Configure demo Konnect Control Plane
-    if: ${{ inputs.deck_config_file != '' }}
     shell: bash
     env:
       PLUGINS_FILE: ${{ inputs.deck_plugins_file }}
