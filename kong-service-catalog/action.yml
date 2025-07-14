@@ -48,7 +48,7 @@ runs:
         deck file add-plugins ${{ inputs.deck_plugins_file }} > /tmp/kong.yaml
         deck file merge ${{ inputs.deck_consumers_file }} /tmp/kong.yaml | \
         deck --konnect-token ${{ inputs.konnect_token }} --konnect-control-plane-name demo --select-tag ${{ inputs.deck_select_tag }} gateway sync
-
+        sleep 10 # Wait for the sync to complete
   - name: Create Service Catalog Entry
     shell: bash
     id: create_service
