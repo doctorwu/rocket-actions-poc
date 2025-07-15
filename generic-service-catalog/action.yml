@@ -89,10 +89,11 @@ runs:
           slugs='${{ fromJSON(inputs.slugs) }}'
           titles='${{ fromJSON(inputs.titles) }}'
           filenames='${{ fromJSON(inputs.filenames) }}'
-          echo $slugs | jq ".[]" -r | while read -r slug ;
+          echo $slugs | jq ".[]" -r | while read -r s ;
           do
-            title=$(echo $titles | jq ".[$i]")
-            filename=$(echo $filenames | jq ".[$i]")
+            export slug=$s
+            export title=$(echo $titles | jq ".[$i]")
+            export filename=$(echo $filenames | jq ".[$i]")
             export raw_content=`cat /tmp/docs_${i}.md| base64 -w0` ; cat ${{ github.action_path }}/documentation-template.json | envsubst '$slug $title $filename $raw_content' > /tmp/documentation.json
             http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/documentation.json
             i=$((i+1))
