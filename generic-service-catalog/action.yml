@@ -54,7 +54,7 @@ runs:
         run: |
           i=0
           source_files='${{ fromJSON(inputs.source_file) }}'
-          echo $source_files | jq ".[]" | while read -r file ;
+          echo $source_files | jq ".[]" -r | while read -r file ;
           do f=`cat $GITHUB_WORKSPACE/$file`; echo $f | python ${{ github.action_path }}/ai-convert.py \
               --template ${{ inputs.source_format }} \
               --ai_gateway_url http://rocket-poc.kong-sales-engineering.com/convert > /tmp/docs_${i}.md ;
