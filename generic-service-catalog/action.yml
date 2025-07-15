@@ -70,6 +70,10 @@ runs:
           echo "service_id=$(echo $payload | jq -r '.id')" >> $GITHUB_OUTPUT
       - name: Attach Documentation to Service
         shell: bash
+        env:
+          slug: ${{ inputs.slug }}
+          title: ${{ inputs.title }}
+          filename: ${{ inputs.filename }}
         run: |
           export raw_content=`cat /tmp/docs.md| base64 -w0` ; cat ${{ github.action_path }}/documentation-template.json | envsubst '$slug $title $filename $raw_content' > /tmp/documentation.json
           http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/documentation.json
