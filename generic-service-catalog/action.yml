@@ -84,6 +84,7 @@ runs:
           titles: ${{ inputs.titles }}
           filenames: ${{ inputs.filenames }}
         run: |
+          # Attach documentation to the service catalog entry
           i=0
           slugs='${{ fromJSON(inputs.slugs) }}'
           titles='${{ fromJSON(inputs.titles) }}'
