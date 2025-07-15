@@ -1,0 +1,7 @@
+{
+	"slug": "${slug}",
+	"status": "published",
+	"title": "${title}",
+	"raw_content": "${raw_content}",
+	"filename": "${filename}"
+}

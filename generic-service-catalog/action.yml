@@ -11,11 +11,35 @@ inputs:
   source_file:  # id of input
     description: 'Path to the source AI specification file'
     required: true
-  service_template:
-    description: 'Template to use for the service catalog entry'
+  service_name:
+    description: 'Name of the service to be created in the service catalog'
     required: true
-  documentation_template:
-    description: 'Template for the documentation to be attached'
+  service_display_name:
+    description: 'Display name of the service to be created in the service catalog'
+    required: true
+  service_description:
+    description: 'Description of the service to be created in the service catalog'
+    required: true
+  service_owner:
+    description: 'Owner of the service to be created in the service catalog'
+    required: true
+  service_cost_center:
+    description: 'Cost center for the service to be created in the service catalog'
+    required: true
+  service_slack_channel_name:
+    description: 'Slack channel name for the service to be created in the service catalog'
+    required: true
+  service_slack_channel_link:
+    description: 'Slack channel link for the service to be created in the service catalog'
+    required: true
+  slug:
+    description: 'Slug for the documentation'
+    required: true
+  title:
+    description: 'Title for the documentation'
+    required: true
+  filename:
+    description: 'Filename for the documentation'
     required: true
 outputs:
   service-id:
@@ -32,11 +56,20 @@ runs:
       - name: Create Service Catalog Entry
         id: create_service
         shell: bash
+        env:
+          service_name: ${{ inputs.service_name }}
+          service_display_name: ${{ inputs.service_display_name }}
+          service_description: ${{ inputs.service_description }}
+          service_owner: ${{ inputs.service_owner }}
+          service_cost_center: ${{ inputs.service_cost_center }}
+          service_slack_channel_name: ${{ inputs.service_slack_channel_name }}
+          service_slack_channel_link: ${{ inputs.service_slack_channel_link }}
         run: |
-          payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ inputs.konnect_token }}" < ${{ inputs.service_template }}`
+          cat service-catalog-entry-template.json | envsubst '$service_name $service_display_name $service_description $service_owner $service_cost_center $service_slack_channel_name $service_slack_channel_link' > /tmp/service-catalog-entry.json
+          payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/service-catalog-entry.json`
           echo "service_id=$(echo $payload | jq -r '.id')" >> $GITHUB_OUTPUT
       - name: Attach Documentation to Service
         shell: bash
         run: |
-          export raw_content=`cat /tmp/docs.md| base64 -w0` ; cat ${{ inputs.documentation_template }} | envsubst '$raw_content' > /tmp/documentation.json
+          export raw_content=`cat /tmp/docs.md| base64 -w0` ; cat documentation-template.json | envsubst '$slug $title $filename $raw_content' > /tmp/documentation.json
           http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/documentation.json

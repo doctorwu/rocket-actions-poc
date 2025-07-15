@@ -1,0 +1,20 @@
+{
+  "name": "${service_name}",
+  "display_name": "${service_display_name}",
+  "description": "${service_description}",
+    "custom_fields": {
+        "owner": "${service_owner}",
+        "cost_center": "${service_cost_center}",
+        "slack_channel": {
+            "name": "${service_slack_channel_name}",
+            "link": "${service_slack_channel_link}",
+            "hasNameError": false,
+            "hasLinkError": false
+        },
+        "jira_project": null,
+        "product_manager": null,
+        "git_repo": null,
+        "dashboard": null
+    },
+		"labels": {}
+}
