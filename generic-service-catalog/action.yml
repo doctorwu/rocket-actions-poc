@@ -51,7 +51,7 @@ runs:
       - name: Generate Markdown Documentation
         shell: bash
         run: |
-          cat ${{ inputs.source_file }} | python ./ai-convert.py --template ${{ inputs.source_format }} > /tmp/docs.md
+          cat ${{ inputs.source_file }} | python ${{ github.action_path }}/generic-service-catalog/ai-convert.py --template ${{ inputs.source_format }} > /tmp/docs.md
 
       - name: Create Service Catalog Entry
         id: create_service
