@@ -90,8 +90,9 @@ runs:
           filenames='${{ fromJSON(inputs.filenames) }}'
           echo $slugs | jq ".[]" -r | while read -r slug ;
           do
-            title=$(echo $titles | jq ".[] | select(.slug == \"$slug\") | .title")
-            filename=$(echo $filenames | jq ".[] | select(.slug == \"$slug\") | .filename")
+            title=$(echo $titles | jq ".[$i]")
+            filename=$(echo $filenames | jq ".[$i]")
             export raw_content=`cat /tmp/doc_${i}.md| base64 -w0` ; cat ${{ github.action_path }}/documentation-template.json | envsubst '$slug $title $filename $raw_content' > /tmp/documentation.json
             http POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/documents" Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/documentation.json
+            i=$((i+1))
           done
