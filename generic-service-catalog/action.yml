@@ -58,7 +58,7 @@ runs:
           do f=`cat $GITHUB_WORKSPACE/$file`; echo $f | python ${{ github.action_path }}/ai-convert.py \
               --template ${{ inputs.source_format }} \
               --ai_gateway_url http://rocket-poc.kong-sales-engineering.com/convert > /tmp/docs_${i}.md ;
-              echo /tmp/docs_${i}.md;
+              cat /tmp/docs_${i}.md;
               i=$((i+1));
           done
 
