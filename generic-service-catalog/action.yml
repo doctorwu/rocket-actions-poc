@@ -62,21 +62,21 @@ runs:
               i=$((i+1));
           done
 
-      - name: Create Service Catalog Entry
-        id: create_service
-        shell: bash
-        env:
-          service_name: ${{ inputs.service_name }}
-          service_display_name: ${{ inputs.service_display_name }}
-          service_description: ${{ inputs.service_description }}
-          service_owner: ${{ inputs.service_owner }}
-          service_cost_center: ${{ inputs.service_cost_center }}
-          service_slack_channel_name: ${{ inputs.service_slack_channel_name }}
-          service_slack_channel_link: ${{ inputs.service_slack_channel_link }}
-        run: |
-          cat ${{ github.action_path }}/service-catalog-entry-template.json | envsubst '$service_name $service_display_name $service_description $service_owner $service_cost_center $service_slack_channel_name $service_slack_channel_link' > /tmp/service-catalog-entry.json
-          payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/service-catalog-entry.json`
-          echo "service_id=$(echo $payload | jq -r '.id')" >> $GITHUB_OUTPUT
+      # - name: Create Service Catalog Entry
+      #   id: create_service
+      #   shell: bash
+      #   env:
+      #     service_name: ${{ inputs.service_name }}
+      #     service_display_name: ${{ inputs.service_display_name }}
+      #     service_description: ${{ inputs.service_description }}
+      #     service_owner: ${{ inputs.service_owner }}
+      #     service_cost_center: ${{ inputs.service_cost_center }}
+      #     service_slack_channel_name: ${{ inputs.service_slack_channel_name }}
+      #     service_slack_channel_link: ${{ inputs.service_slack_channel_link }}
+      #   run: |
+      #     cat ${{ github.action_path }}/service-catalog-entry-template.json | envsubst '$service_name $service_display_name $service_description $service_owner $service_cost_center $service_slack_channel_name $service_slack_channel_link' > /tmp/service-catalog-entry.json
+      #     payload=`http POST $BASE_SERVICE_HUB_URL/services Authorization:"Bearer ${{ inputs.konnect_token }}" < /tmp/service-catalog-entry.json`
+      #     echo "service_id=$(echo $payload | jq -r '.id')" >> $GITHUB_OUTPUT
       - name: Attach Documentation to Service
         shell: bash
         env:
