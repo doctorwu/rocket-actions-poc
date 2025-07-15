@@ -53,7 +53,7 @@ runs:
 
         run: |
           i=0
-          source_files="${{ fromJSON(inputs.source_file) }}
+          source_files="${{ fromJSON(inputs.source_file) }}"
           echo $source_files | jq ".[]" | while read -r file ;
           do f=`cat $file`; echo $f | python ${{ github.action_path }}/ai-convert.py \
               --template ${{ inputs.source_format }} \
