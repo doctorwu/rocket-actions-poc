@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Post stdin data to a URL.")
 parser.add_argument(
-    "--template", help="These are templates from the Kong AI Template plugin configuration.", default=None, choices=["raml", "wsdl"]
+    "--template", help="These are templates from the Kong AI Template plugin configuration.", default=None
 )
 parser.add_argument(
     "--ai_gateway_url", help="URL to Kong AI Gateway.", default="http://localhost:8000/convert"
