@@ -41,6 +41,12 @@ inputs:
   filenames:
     description: 'Filename for the documentation'
     required: true
+  passthroughs:
+    description: 'Passthrough, do not use AI converter'
+    default: 'false'
+    type: boolean
+    required: true
+
 outputs:
   service-id:
     description: "Service ID"
@@ -50,15 +56,26 @@ runs:
   steps:
       - name: Generate Markdown Documentation
         shell: bash
-
         run: |
           # Convert all source files to markdown using the AI converter
           i=0
           source_files='${{ fromJSON(inputs.source_files) }}'
+          passthroughs='${{ fromJSON(inputs.passthroughs) }}'
           echo $source_files | jq ".[]" -r | while read -r file ;
-          do f=`cat $GITHUB_WORKSPACE/$file`; echo $f | python ${{ github.action_path }}/ai-convert.py \
-              --template ${{ inputs.source_format }} \
-              --ai_gateway_url http://rocket-poc.kong-sales-engineering.com/convert > /tmp/docs_${i}.md ;
+          do
+              passthrough=$(echo $passthroughs | jq -r ".[${i}]")
+              if [ "$passthrough" = "true" ]; then
+                  echo "Skipping AI conversion for $file"
+                  cp $GITHUB_WORKSPACE/$file /tmp/docs_${i}.md
+                  continue
+              else
+                f=`cat $GITHUB_WORKSPACE/$file`
+                echo $f | python ${{ github.action_path }}/ai-convert.py \
+                --template ${{ inputs.source_format }} \
+                --ai_gateway_url http://rocket-poc.kong-sales-engineering.com/convert > /tmp/docs_${i}.md
+                continue
+              fi
+
               i=$((i+1));
           done
       - name: Create Service Catalog Entry
