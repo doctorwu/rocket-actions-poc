@@ -67,13 +67,11 @@ runs:
               if [ "$passthrough" = "true" ]; then
                   echo "Skipping AI conversion for $file"
                   cp $GITHUB_WORKSPACE/$file /tmp/docs_${i}.md
-                  continue
               else
                 f=`cat $GITHUB_WORKSPACE/$file`
                 echo $f | python ${{ github.action_path }}/ai-convert.py \
                 --template ${{ inputs.source_format }} \
                 --ai_gateway_url http://rocket-poc.kong-sales-engineering.com/convert > /tmp/docs_${i}.md
-                continue
               fi
 
               i=$((i+1));
