@@ -80,7 +80,7 @@ runs:
   - name: Map GitHub Integration to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.github_integration_id.outputs.integration_resource_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/resource-mappings" Authorization:"Bearer ${{ inputs.konnect_token }}" resource="${{ steps.github_integration_id.outputs.integration_resource_id }}" service="${{ steps.create_service.outputs.service_id }}"
 
   - name: Get Control Plane id
     shell: bash
@@ -99,7 +99,7 @@ runs:
   - name: Map Gateway Service to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.httpbin_service_id.outputs.httpbin_service_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/resource-mappings" Authorization:"Bearer ${{ inputs.konnect_token }}" resource="${{ steps.httpbin_service_id.outputs.httpbin_service_id }}" service="${{ steps.create_service.outputs.service_id }}"
 
   - name: Get Analytics Resource ID
     shell: bash
@@ -112,4 +112,4 @@ runs:
   - name: Map Analytics Resource to Service Catalog Entry
     shell: bash
     run: |
-      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/${{ steps.create_service.outputs.service_id }}/resources" Authorization:"Bearer ${{ inputs.konnect_token }}" resource_id="${{ steps.analytics_resource.outputs.analytics_resource_id }}"
+      http --ignore-stdin POST "$BASE_SERVICE_HUB_URL/services/resource-mappings" Authorization:"Bearer ${{ inputs.konnect_token }}" resource="${{ steps.analytics_resource.outputs.analytics_resource_id }}" service="${{ steps.create_service.outputs.service_id }}"
