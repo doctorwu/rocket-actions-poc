@@ -37,6 +37,9 @@ inputs:
   deck_consumers_file:
     description: 'Path to the consumers file'
     required: false
+  deck_patch_file:
+    description: 'Path to the deck patch file'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -46,7 +49,7 @@ runs:
         cat ${{ inputs.openapi_spec }} | \
         deck file openapi2kong --select-tag ${{ inputs.deck_select_tag }} -i | \
         deck file add-plugins ${{ inputs.deck_plugins_file }} > /tmp/kong.yaml
-        deck file merge ${{ inputs.deck_consumers_file }} /tmp/kong.yaml | \
+        deck file merge ${{ inputs.deck_consumers_file }} | deck file patch ${{ inputs.deck_patch_file }} /tmp/kong.yaml | \
         deck --konnect-token ${{ inputs.konnect_token }} --konnect-control-plane-name demo --select-tag ${{ inputs.deck_select_tag }} gateway sync
         sleep 10 # Wait for the sync to complete
   - name: Create Service Catalog Entry
